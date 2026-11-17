@@ -1,0 +1,37 @@
+
+name: Build REMINDLY APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'REMINDLY_0.3.0_source.zip'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Extract project
+        run: |
+          unzip REMINDLY_0.3.0_source.zip -d source
+
+      - name: Build APK
+        run: |
+          cd source/remindly_review
+          gradle assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: REMINDLY-debug-apk
+          path: source/remindly_review/app/build/outputs/apk/debug/*.apk
